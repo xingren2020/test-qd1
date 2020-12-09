@@ -1,5 +1,7 @@
 const $ = new Env('企鹅读书');
+const qdck = $.isNode() ? require('./qqread.js') : '';
 const notify = $.isNode() ? require("./sendNotify") : "";
+// console.log(qdck)
 
 let tz = "";
 let kz = "";
@@ -19,33 +21,30 @@ const qqreadbdArr = [];
 const qqreadtimeurlArr = [];
 const qqreadtimehdArr = [];
 
-let cookies = [];
+let COOKIES_SPLIT = "#";
 let cookiesArr = [];
+
 if ($.isNode()) {
-    if (process.env.QD_COOKIE) {
-        cookies = process.env.QD_COOKIE;
-        Object.keys(cookies).forEach((item) => {
-            cookiesArr.push(cookies[item])
-        });
-        for (let i = 0; i < cookiesArr.length; i++) {
-            qqreadbdArr.push(cookiesArr[i][0])
-            qqreadtimeurlArr.push(cookiesArr[i][1])
-            qqreadtimehdArr.push(cookiesArr[i][2])
-        };
-        console.log(
-            `============ 共${qqreadtimehdArr.length}个企鹅读书账号  =============\n`
-        );
-        console.log(
-            `============ 脚本执行-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`
-        );
-    } else {
-        !(async () => {
-            if (!cookiesArr[0]) {
-                $.msg($.name, '【提示】请先获取企鹅阅读cookie', '');
-                return;
-            }
-        })
+    Object.keys(qdck).forEach((item) => {
+        cookiesArr.push(qdck[item])
+    });
+    if (process.env.COOKIES_SPLIT) {
+        COOKIES_SPLIT = process.env.COOKIES_SPLIT;
     }
+    console.log(
+        `============ cookies分隔符为：${JSON.stringify(COOKIES_SPLIT)} =============\n`
+    );
+    for (let i = 0; i < cookiesArr.length; i++) {
+        qqreadbdArr.push(cookiesArr[i].split(COOKIES_SPLIT)[0])
+        qqreadtimeurlArr.push(cookiesArr[i].split(COOKIES_SPLIT)[1])
+        qqreadtimehdArr.push(cookiesArr[i].split(COOKIES_SPLIT)[2])
+    };
+    console.log(
+        `============ 共${qqreadtimehdArr.length}个企鹅读书账号  =============\n`
+    );
+    console.log(
+        `============ 脚本执行-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`
+    );
 } else {
     qqreadbdArr.push($.getdata("qqreadbd"));
     qqreadtimeurlArr.push($.getdata("qqreadtimeurl"));
@@ -58,7 +57,6 @@ if ((isGetCookie = typeof $request !== "undefined")) {
 }
 
 function GetCookie() {
-
     if ($request && $request.url.indexOf("addReadTimeWithBid?") >= 0) {
         const qqreadtimeurlVal = $request.url;
         if (qqreadtimeurlVal) $.setdata(qqreadtimeurlVal, "qqreadtimeurl");
