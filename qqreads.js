@@ -1,5 +1,5 @@
 const $ = new Env('企鹅读书');
-const qdck = $.isNode() ? require('./qqread.js') : '';
+const qdck = $.isNode() ? require('./qdCookie.js') : '';
 const notify = $.isNode() ? require("./sendNotify") : "";
 // console.log(qdck)
 
